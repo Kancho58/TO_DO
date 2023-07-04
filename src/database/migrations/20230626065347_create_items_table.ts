@@ -12,10 +12,9 @@ export async function up(knex: Knex): Promise<void> {
       table
         .integer('user_id')
         .unsigned()
-        .nullable()
+        .notNullable()
         .references('id')
-        .inTable(Table.USERS)
-        .onDelete('SET NULL');
+        .inTable(Table.USERS);
 
       table.timestamps(true, true);
     })

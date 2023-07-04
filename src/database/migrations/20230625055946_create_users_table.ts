@@ -7,7 +7,7 @@ export async function up(knex: Knex): Promise<void> {
   return knex.schema
     .createTable(Table.USERS, (table: Knex.TableBuilder) => {
       table.increments('id').primary();
-      table.string('name', 128).unique().notNullable();
+      table.string('name', 128).notNullable();
       table.string('email', 128).unique().notNullable();
 
       table.timestamps(true, true);

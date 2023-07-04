@@ -21,14 +21,13 @@ export async function save(
   }
 }
 
-export async function fetch(
+export async function fetchItems(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<any> {
   try {
-    const id: number = parseInt(req.params.id);
-    const data = await itemServices.fetch(id);
+    const data = await itemServices.fetchItems();
     res.status(HttpStatus.StatusCodes.OK).json({
       sucess: true,
       ...data,

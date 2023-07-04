@@ -8,11 +8,13 @@ export async function save(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  console.log('save');
   try {
     const userPayload = req.body as UserPayload;
-    console.log(userPayload);
-
+    console.log(userPayload, 'userPayload');
     const users = await userServices.save(userPayload);
+    console.log(users, 'here am i');
+
     res.status(HttpStatus.StatusCodes.CREATED).json({
       sucess: true,
       data: users,
@@ -22,17 +24,17 @@ export async function save(
   }
 }
 
-export async function fetch(
+export async function fetchUsers(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<any> {
   try {
-    const id: number = parseInt(req.params.id);
-    const data = await userServices.fetch(id);
+    // const id: number = parseInt(req.params.id);
+    const data = await userServices.fetchUsers();
     res.status(HttpStatus.StatusCodes.OK).json({
       sucess: true,
-      ...data,
+      data,
     });
   } catch (err) {
     next(err);
