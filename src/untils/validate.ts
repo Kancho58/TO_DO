@@ -11,5 +11,5 @@ export default async function validate<T>(
   data: T,
   schema: Joi.Schema
 ): Promise<void> {
-  await schema.validate(data);
+  await schema.validateAsync(data);
 }

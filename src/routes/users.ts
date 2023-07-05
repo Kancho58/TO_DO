@@ -5,8 +5,10 @@ import { userSchema } from '../validators/user';
 
 const router = Router();
 
-router.route('/').post(validate.schema(userSchema), userControllers.save);
-router.route('/:id').get(userControllers.fetch);
+router
+  .route('/')
+  .get(userControllers.fetchUsers)
+  .post(validate.schema(userSchema), userControllers.save);
 router.route('/:id').patch(validate.schema(userSchema), userControllers.update);
 
 export default router;

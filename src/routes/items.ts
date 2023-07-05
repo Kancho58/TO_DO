@@ -5,10 +5,10 @@ import { itemSchema } from '../validators/item';
 
 const router = Router();
 
-router.route('/').post(validate.schema(itemSchema), itemControllers.save);
-router.route('/:id').get(itemControllers.fetch);
 router
-  .route('/:itemId')
-  .patch(validate.schema(itemSchema), itemControllers.update);
+  .route('/')
+  .get(itemControllers.fetchItems)
+  .post(validate.schema(itemSchema), itemControllers.save);
+router.route('/:id').patch(validate.schema(itemSchema), itemControllers.update);
 
 export default router;
