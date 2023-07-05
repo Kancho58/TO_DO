@@ -11,9 +11,7 @@ export async function save(
   console.log('save');
   try {
     const userPayload = req.body as UserPayload;
-    console.log(userPayload, 'userPayload');
     const users = await userServices.save(userPayload);
-    console.log(users, 'here am i');
 
     res.status(HttpStatus.StatusCodes.CREATED).json({
       sucess: true,
@@ -30,7 +28,6 @@ export async function fetchUsers(
   next: NextFunction
 ): Promise<any> {
   try {
-    // const id: number = parseInt(req.params.id);
     const data = await userServices.fetchUsers();
     res.status(HttpStatus.StatusCodes.OK).json({
       sucess: true,

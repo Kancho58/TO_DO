@@ -62,7 +62,9 @@ export async function update(
       logger.log('info', 'User not found');
       throw new BadRequestError('User not found');
     }
-    await knex(Table.USERS).update(object.toSnakeCase({ name, email }));
+    await knex(Table.USERS)
+      .where('id', userId)
+      .update(object.toSnakeCase({ name, email }));
     logger.log('info', 'User updated successfully');
   } catch (err) {
     throw err;
