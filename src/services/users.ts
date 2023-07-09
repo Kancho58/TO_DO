@@ -31,6 +31,8 @@ export async function save(userPayload: UserPayload): Promise<any> {
   }
 }
 export async function fetchUsers(): Promise<any> {
+  logger.log('Info', 'Fetching users');
+
   const users = await knex(Table.USERS).select('*');
 
   if (!users) {
@@ -51,7 +53,7 @@ export async function fetchUsers(): Promise<any> {
 export async function update(
   userId: number,
   userPayload: UserPayload
-): Promise<void> {
+): Promise<any> {
   try {
     const { name, email } = userPayload;
 
@@ -62,10 +64,14 @@ export async function update(
       logger.log('info', 'User not found');
       throw new BadRequestError('User not found');
     }
-    await knex(Table.USERS)
+    const updatedUser = await knex(Table.USERS)
       .where('id', userId)
-      .update(object.toSnakeCase({ name, email }));
+      .update(object.toSnakeCase({ name, email }))
+      .returning(['name', 'email']);
+
     logger.log('info', 'User updated successfully');
+
+    return updatedUser;
   } catch (err) {
     throw err;
   }

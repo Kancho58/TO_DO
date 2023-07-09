@@ -10,10 +10,11 @@ export async function save(
 ): Promise<void> {
   try {
     const itemPayload = req.body as ItemPayload;
-    console.log(itemPayload);
-    const item = await itemServices.save(itemPayload);
+    const userId: number = parseInt(req.params.id);
+    const item = await itemServices.save(itemPayload, userId);
+
     res.status(HttpStatus.StatusCodes.CREATED).json({
-      sucess: true,
+      success: true,
       data: item,
     });
   } catch (err) {
@@ -27,10 +28,11 @@ export async function fetchItems(
   next: NextFunction
 ): Promise<any> {
   try {
-    const data = await itemServices.fetchItems();
+    const userId: number = parseInt(req.params.id);
+    const data = await itemServices.fetchItems(userId);
     res.status(HttpStatus.StatusCodes.OK).json({
-      sucess: true,
-      ...data,
+      success: true,
+      data,
     });
   } catch (err) {
     next(err);
@@ -46,9 +48,10 @@ export async function update(
     const itemPayload = req.body as ItemPayload;
     const id: number = parseInt(req.params.id);
 
-    await itemServices.update(id, itemPayload);
+    const updatedItem = await itemServices.update(id, itemPayload);
     res.status(HttpStatus.StatusCodes.OK).json({
-      sucess: true,
+      success: true,
+      data: updatedItem,
     });
   } catch (err) {
     next(err);

@@ -7,8 +7,8 @@ import Table from '../resources/enums/Table';
 import * as object from '../untils/object';
 
 export async function save(
-  itemPayload: ItemPayload
-  // userId: number
+  itemPayload: ItemPayload,
+  userId: number
 ): Promise<any> {
   try {
     const { title, description } = itemPayload;
@@ -16,21 +16,30 @@ export async function save(
     const item = await knex(Table.ITEMS).where(
       knex.raw('LOWER(title) =?', title.toLowerCase())
     );
+
     if (item.length) {
       logger.log('info', 'Title already exists');
       throw new BadRequestError('Title already exists');
     }
 
-    await knex(Table.ITEMS).insert(object.toSnakeCase({ title, description }));
+    logger.log('info', 'Item Inserting');
+    const newItem = await knex(Table.ITEMS)
+      .insert(object.toSnakeCase({ title, description, userId }))
+      .returning(['title', 'description']);
 
-    return item;
+    logger.log('Info', 'Item successfully inserted');
+    return newItem;
   } catch (err) {
     throw err;
   }
 }
 
-export async function fetchItems(): Promise<any> {
-  const items = await knex(Table.ITEMS).select('*');
+export async function fetchItems(userId: number): Promise<any> {
+  logger.log('Info', 'Fetching items');
+
+  const items = await knex(Table.ITEMS)
+    .select('*')
+    .where(object.toSnakeCase({ userId }));
 
   if (!items) {
     logger.log('info', 'Item not found');
@@ -46,33 +55,27 @@ export async function fetchItems(): Promise<any> {
   return data;
 }
 
-// export const getItemByUserId = async (userId: number): Promise<any> => {
-//   return object.camelize(
-//     (
-//       await knex(Table.USERS)
-//         .innerJoin('items', 'user.id', '=', 'item.user_id')
-//         .whereRaw('users.id = ?', [userId])
-//     )[0]
-//   );
-// };
-
 export async function update(
   itemId: number,
   itemPayload: ItemPayload
-): Promise<void> {
+): Promise<any> {
   try {
     const { title, description } = itemPayload;
+
+    logger.log('Info', 'Fetching items');
 
     const item = await knex(Table.ITEMS).where({ id: itemId });
 
     if (!item) {
       logger.log('info', 'Item not found');
       throw new BadRequestError('Item not found');
-    } else {
-      await knex(Table.ITEMS)
-        .where({ id: itemId })
-        .update(object.toSnakeCase({ title, description }));
     }
+    const updatedItem = await knex(Table.ITEMS)
+      .where({ id: itemId })
+      .update(object.toSnakeCase({ title, description }))
+      .returning(['title', 'description']);
+
+    return updatedItem;
   } catch (err) {
     throw err;
   }

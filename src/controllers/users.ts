@@ -14,7 +14,7 @@ export async function save(
     const users = await userServices.save(userPayload);
 
     res.status(HttpStatus.StatusCodes.CREATED).json({
-      sucess: true,
+      success: true,
       data: users,
     });
   } catch (err) {
@@ -30,7 +30,7 @@ export async function fetchUsers(
   try {
     const data = await userServices.fetchUsers();
     res.status(HttpStatus.StatusCodes.OK).json({
-      sucess: true,
+      success: true,
       data,
     });
   } catch (err) {
@@ -47,9 +47,10 @@ export async function update(
     const userPayload = req.body as UserPayload;
     const id: number = parseInt(req.params.id);
 
-    await userServices.update(id, userPayload);
+    const updatedUser = await userServices.update(id, userPayload);
     res.status(HttpStatus.StatusCodes.OK).json({
-      sucess: true,
+      success: true,
+      data: updatedUser,
     });
   } catch (err) {
     next(err);
