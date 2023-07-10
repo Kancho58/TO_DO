@@ -28,7 +28,11 @@ export async function fetchUsers(
   next: NextFunction
 ): Promise<any> {
   try {
-    const data = await userServices.fetchUsers();
+    const page = Number(req.params.page) || 1;
+    const perPage = Number(req.params.perPage || 5);
+    const total = perPage * (page - 1);
+
+    const data = await userServices.fetchUsers(page, perPage, total);
     res.status(HttpStatus.StatusCodes.OK).json({
       success: true,
       data,
