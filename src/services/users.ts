@@ -30,11 +30,16 @@ export async function save(userPayload: UserPayload): Promise<any> {
     throw err;
   }
 }
-export async function fetchUsers(): Promise<any> {
-  logger.log('Info', 'Fetching users');
-
-  const users = await knex(Table.USERS).select('*');
-
+export async function fetchUsers(
+  page: number,
+  perPage: number,
+  total: number
+): Promise<any> {
+  const users = await knex(Table.USERS)
+    .select('*')
+    .orderBy('id')
+    .limit(perPage)
+    .offset(total);
   if (!users) {
     logger.log('info', 'User not found');
     throw new BadRequestError('User not found');
@@ -47,7 +52,7 @@ export async function fetchUsers(): Promise<any> {
     email: user.email,
   }));
 
-  return data;
+  return { data, page, perPage, total };
 }
 
 export async function update(
@@ -66,9 +71,7 @@ export async function update(
     }
     const updatedUser = await knex(Table.USERS)
       .where('id', userId)
-      .update(object.toSnakeCase({ name, email }))
-      .returning(['name', 'email']);
-
+      .update(object.toSnakeCase({ name, email }));
     logger.log('info', 'User updated successfully');
 
     return updatedUser;

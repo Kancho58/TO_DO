@@ -34,12 +34,20 @@ export async function save(
   }
 }
 
-export async function fetchItems(userId: number): Promise<any> {
+export async function fetchItems(
+  userId: number,
+  page: number,
+  perPage: number,
+  total: number
+): Promise<any> {
   logger.log('Info', 'Fetching items');
 
   const items = await knex(Table.ITEMS)
     .select('*')
-    .where(object.toSnakeCase({ userId }));
+    .where(object.toSnakeCase({ userId }))
+    .orderBy('id')
+    .limit(perPage)
+    .offset(total);
 
   if (!items) {
     logger.log('info', 'Item not found');
@@ -52,7 +60,7 @@ export async function fetchItems(userId: number): Promise<any> {
     title: item.title,
     description: item.description,
   }));
-  return data;
+  return { data, page, perPage, total };
 }
 
 export async function update(
@@ -72,9 +80,9 @@ export async function update(
     }
     const updatedItem = await knex(Table.ITEMS)
       .where({ id: itemId })
-      .update(object.toSnakeCase({ title, description }))
-      .returning(['title', 'description']);
+      .update(object.toSnakeCase({ title, description }));
 
+    logger.log('info', 'Item updated successfully');
     return updatedItem;
   } catch (err) {
     throw err;
