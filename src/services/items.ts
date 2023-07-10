@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
 import knex from '../config/knex';
 import logger from '../untils/logger';
-import { ItemPayload } from '../domains/requests/itempayload';
+import { ItemPayload, FetchItems } from '../domains/requests/itempayload';
 import BadRequestError from '../exceptions/BadRequestError';
 import Table from '../resources/enums/Table';
 import * as object from '../untils/object';
@@ -9,7 +9,7 @@ import * as object from '../untils/object';
 export async function save(
   itemPayload: ItemPayload,
   userId: number
-): Promise<any> {
+): Promise<ItemPayload> {
   try {
     const { title, description } = itemPayload;
 
@@ -27,8 +27,8 @@ export async function save(
       .insert(object.toSnakeCase({ title, description, userId }))
       .returning(['title', 'description']);
 
-    logger.log('Info', 'Item successfully inserted');
-    return newItem;
+    logger.log('info', 'Item successfully inserted');
+    return object.camelize(newItem);
   } catch (err) {
     throw err;
   }
@@ -39,8 +39,8 @@ export async function fetchItems(
   page: number,
   perPage: number,
   total: number
-): Promise<any> {
-  logger.log('Info', 'Fetching items');
+): Promise<FetchItems> {
+  logger.log('info', 'Fetching items');
 
   const items = await knex(Table.ITEMS)
     .select('*')
@@ -57,20 +57,21 @@ export async function fetchItems(
   logger.log('info', 'Item fetched successfully');
 
   const data = items.map((item) => ({
+    id: item.id,
     title: item.title,
     description: item.description,
   }));
-  return { data, page, perPage, total };
+  return object.camelize({ data, page, perPage, total });
 }
 
 export async function update(
   itemId: number,
   itemPayload: ItemPayload
-): Promise<any> {
+): Promise<ItemPayload> {
   try {
     const { title, description } = itemPayload;
 
-    logger.log('Info', 'Fetching items');
+    logger.log('info', 'Fetching items');
 
     const item = await knex(Table.ITEMS).where({ id: itemId });
 
@@ -80,10 +81,11 @@ export async function update(
     }
     const updatedItem = await knex(Table.ITEMS)
       .where({ id: itemId })
-      .update(object.toSnakeCase({ title, description }));
+      .update(object.toSnakeCase({ title, description }))
+      .returning(['title', 'description']);
 
     logger.log('info', 'Item updated successfully');
-    return updatedItem;
+    return object.camelize(updatedItem);
   } catch (err) {
     throw err;
   }

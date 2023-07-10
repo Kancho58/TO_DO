@@ -28,15 +28,15 @@ export async function fetchItems(
   next: NextFunction
 ): Promise<any> {
   try {
-    const page = Number(req.params.page) || 1;
-    const perPage = Number(req.params.perPage || 5);
+    const page = Number(req.query.page) || 1;
+    const perPage = Number(req.query.perPage || 5);
     const total = perPage * (page - 1);
 
     const userId: number = parseInt(req.params.id);
     const data = await itemServices.fetchItems(userId, page, perPage, total);
     res.status(HttpStatus.StatusCodes.OK).json({
       success: true,
-      data,
+      ...data,
     });
   } catch (err) {
     next(err);

@@ -8,7 +8,6 @@ export async function save(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  console.log('save');
   try {
     const userPayload = req.body as UserPayload;
     const users = await userServices.save(userPayload);
@@ -28,14 +27,14 @@ export async function fetchUsers(
   next: NextFunction
 ): Promise<any> {
   try {
-    const page = Number(req.params.page) || 1;
-    const perPage = Number(req.params.perPage || 5);
+    const page = Number(req.query.page) || 1;
+    const perPage = Number(req.query.perPage || 5);
     const total = perPage * (page - 1);
 
     const data = await userServices.fetchUsers(page, perPage, total);
     res.status(HttpStatus.StatusCodes.OK).json({
       success: true,
-      data,
+      ...data,
     });
   } catch (err) {
     next(err);

@@ -1,12 +1,12 @@
 /* eslint-disable no-useless-catch */
-import { UserPayload } from '../domains/requests/userpayload';
+import { UserPayload, FetchUsers } from '../domains/requests/userpayload';
 import knex from '../config/knex';
 import logger from '../untils/logger';
 import BadRequestError from '../exceptions/BadRequestError';
 import Table from '../resources/enums/Table';
 import * as object from '../untils/object';
 
-export async function save(userPayload: UserPayload): Promise<any> {
+export async function save(userPayload: UserPayload): Promise<UserPayload> {
   try {
     const { name, email } = userPayload;
 
@@ -19,13 +19,13 @@ export async function save(userPayload: UserPayload): Promise<any> {
       throw new BadRequestError('User already exists');
     }
 
-    logger.log('Info', 'User inserting');
+    logger.log('info', 'User inserting');
     const newUser = await knex(Table.USERS)
       .insert(object.toSnakeCase({ name, email }))
       .returning(['name', 'email']);
-    logger.log('Info', 'User successfully inserted');
+    logger.log('info', 'User successfully inserted');
 
-    return newUser;
+    return object.camelize(newUser);
   } catch (err) {
     throw err;
   }
@@ -34,7 +34,7 @@ export async function fetchUsers(
   page: number,
   perPage: number,
   total: number
-): Promise<any> {
+): Promise<FetchUsers> {
   const users = await knex(Table.USERS)
     .select('*')
     .orderBy('id')
@@ -48,17 +48,18 @@ export async function fetchUsers(
   logger.log('info', 'user fetched successfully');
 
   const data = users.map((user) => ({
+    id: user.id,
     name: user.name,
     email: user.email,
   }));
 
-  return { data, page, perPage, total };
+  return object.camelize({ data, page, perPage, total });
 }
 
 export async function update(
   userId: number,
   userPayload: UserPayload
-): Promise<any> {
+): Promise<UserPayload> {
   try {
     const { name, email } = userPayload;
 
@@ -71,10 +72,12 @@ export async function update(
     }
     const updatedUser = await knex(Table.USERS)
       .where('id', userId)
-      .update(object.toSnakeCase({ name, email }));
+      .update(object.toSnakeCase({ name, email }))
+      .returning(['name', 'email']);
+
     logger.log('info', 'User updated successfully');
 
-    return updatedUser;
+    return object.camelize(updatedUser);
   } catch (err) {
     throw err;
   }
