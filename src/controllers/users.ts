@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { UserPayload } from '../domains/requests/userpayload';
 import * as HttpStatus from 'http-status-codes';
 import * as userServices from '../services/users';
+import LoginPayload from '../domains/requests/loginpayload';
 
 export async function save(
   req: Request,
@@ -15,6 +16,24 @@ export async function save(
     res.status(HttpStatus.StatusCodes.CREATED).json({
       success: true,
       data: users,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function login(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> {
+  try {
+    const user = req.body as LoginPayload;
+
+    const data = await userServices.login(user);
+    res.status(HttpStatus.StatusCodes.OK).json({
+      success: true,
+      data,
     });
   } catch (err) {
     next(err);

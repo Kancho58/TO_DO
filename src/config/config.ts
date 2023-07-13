@@ -24,6 +24,17 @@ export default {
     maxFiles: process.env.LOGGING_MAX_FILES || '7d',
     datePattern: process.env.LOGGING_DATE_PATTERN || 'YYYY-MM-DD',
   },
+  auth: {
+    saltRounds: process.env.SALT_ROUNDS || 11,
+    accessTokenDuration: process.env.ACCESS_TOKEN_DURATION || '10m',
+    refreshTokenDuration: process.env.REFRESH_TOKEN_DURATION || '24h',
+    emailVerificationDuration: process.env.EMAIL_VERIFICATION_DURATION || 24,
+    accessTokenSecretKey:
+      process.env.ACCESS_TOKEN_SECRET_KEY || '<ACCESS_TOKEN_SECRET_KEY>',
+    refreshTokenSecretKey:
+      process.env.REFRESH_TOKEN_SECRET_KEY || '<REFRESH_TOKEN_SECRET_KEY>',
+    cronAuthorizationToken: process.env.CRON_AUTHORIZATION_TOKEN,
+  },
   db: {
     client: process.env.DB_CLIENT,
     connection: {

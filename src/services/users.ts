@@ -2,13 +2,21 @@
 import { UserPayload, FetchUsers } from '../domains/requests/userpayload';
 import knex from '../config/knex';
 import logger from '../untils/logger';
+import config from '../config/config';
 import BadRequestError from '../exceptions/BadRequestError';
 import Table from '../resources/enums/Table';
 import * as object from '../untils/object';
+import * as bcrypt from '../untils/bcrypt';
+import LoginPayload from '../domains/requests/loginpayload';
+import * as jwt from '../untils/jwt';
+import UnauthorizedError from '../exceptions/BadRequestError';
+
+const { errors } = config;
 
 export async function save(userPayload: UserPayload): Promise<UserPayload> {
   try {
-    const { name, email } = userPayload;
+    const { email } = userPayload;
+    const password = await bcrypt.hash(userPayload.password);
 
     const user = await knex(Table.USERS).where(
       knex.raw('LOWER(email) =?', email.toLowerCase())
@@ -21,7 +29,7 @@ export async function save(userPayload: UserPayload): Promise<UserPayload> {
 
     logger.log('info', 'User inserting');
     const newUser = await knex(Table.USERS)
-      .insert(object.toSnakeCase({ name, email }))
+      .insert(object.toSnakeCase({ ...userPayload, password }))
       .returning(['name', 'email']);
     logger.log('info', 'User successfully inserted');
 
@@ -30,6 +38,37 @@ export async function save(userPayload: UserPayload): Promise<UserPayload> {
     throw err;
   }
 }
+
+export async function login(loginPayload: LoginPayload): Promise<LoginPayload> {
+  try {
+    const { email, password } = loginPayload;
+
+    logger.log('info', 'Fetching user');
+    const [user] = await knex(Table.USERS).where(
+      knex.raw('LOWER(email) =?', email.toLowerCase())
+    );
+    if (!user) {
+      throw new BadRequestError('User not found');
+    }
+
+    const oldPassword = await bcrypt.compare(password, user.password || '');
+    if (!oldPassword) {
+      throw new UnauthorizedError(errors.password);
+    }
+
+    logger.log('info', 'Generating access token');
+
+    const accessToken = jwt.generateAccessToken({
+      email: user.email,
+      name: user.name,
+    });
+
+    return object.camelize({ id: user.id, email, accessToken });
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function fetchUsers(
   page: number,
   perPage: number,
@@ -51,6 +90,7 @@ export async function fetchUsers(
     id: user.id,
     name: user.name,
     email: user.email,
+    password: user.password,
   }));
 
   return object.camelize({ data, page, perPage, total });
@@ -62,6 +102,7 @@ export async function update(
 ): Promise<UserPayload> {
   try {
     const { name, email } = userPayload;
+    const password = await bcrypt.hash(userPayload.password);
 
     logger.log('info', 'Fetching User');
     const user = await knex(Table.USERS).where('id', userId);
@@ -72,7 +113,7 @@ export async function update(
     }
     const updatedUser = await knex(Table.USERS)
       .where('id', userId)
-      .update(object.toSnakeCase({ name, email }))
+      .update(object.toSnakeCase({ name, email, password }))
       .returning(['name', 'email']);
 
     logger.log('info', 'User updated successfully');
