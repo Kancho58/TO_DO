@@ -4,7 +4,7 @@
       "logoutSuccess": "Logout successful.",
       "invalidCredentials": "Invalid Credentials",
       "accessTokenRefreshed": "Access token refreshed successfully.",
-      "signupSuccess": "Signup successful. Please check you email for verification code.",
+      "signupSuccess": "Signup successful.",
       "confirmSignup": "Activated successfully.",
       "forgotPassword": "Please check you email for verification code.",
       "forgotPasswordForOldUser": "Password reset link has been sent to your email",
@@ -16,53 +16,6 @@
       "delete": "User removed successfully.",
       "fetchAll": "List of users.",
       "disclaimerAgreed": "Disclaimer agreed."
-    },
-    "squeeze": {
-      "save": "Squeeze inserted successfully.",
-      "fetch": "Squeeze fetched successfully.",
-      "delete": "Squeeze removed successfully.",
-      "fetchAll": "List of squeezes fetched successfully.",
-      "stats": "Squeeze stats fetched successfully."
-    },
-    "profile": {
-      "fetch": "User information fetched successfully.",
-      "update": "User information updated successfully.",
-      "fetchStatus": "User status fetched successfully.",
-      "delete": "Please check your email for verification code.",
-      "confirmDelete": "Account deleted successfully.."
-    },
-    "settings": {
-      "fetch": "User settings fetched successfully.",
-      "update": "User settings updated successfully."
-    },
-    "devices": {
-      "save": "Device inserted successfully."
-    },
-    "phones": {
-      "save": "Phone inserted successfully.",
-      "update": "Phone updated successfully.",
-      "duplicate": "Phone already exists."
-    },
-    "stats": {
-      "fetch": "Stats fetched successfully."
-    },
-    "patients": {
-      "fetchAll": "Patients fetched successfully.",
-      "save": "Patient created successfully. Please check your message for verification token.",
-      "codeSent": "OTP code sent successfully.",
-      "verified": "Patient verified successfully.",
-      "fetch": "Patient details fetched successfully.",
-      "delete": "Patient deleted successfully.",
-      "update": "Patient updated successfully."
-    },
-    "evaluation": {
-      "save": "Evaluation saved successfully",
-      "fetch": "Fetched successfully."
-    },
-    "interventions": {
-      "fetch": "Recommendation fetched successfully.",
-      "save": "Recommendation saved successfully.",
-      "fetchOptions": "Fetched intervention options successfully."
     }
   }
   

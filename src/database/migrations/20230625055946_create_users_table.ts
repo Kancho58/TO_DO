@@ -9,6 +9,7 @@ export async function up(knex: Knex): Promise<void> {
       table.increments('id').primary();
       table.string('name', 128).notNullable();
       table.string('email', 128).unique().notNullable();
+      table.string('password').notNullable();
       table
         .integer('role_id')
         .unsigned()

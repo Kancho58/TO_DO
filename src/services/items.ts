@@ -82,7 +82,7 @@ export async function update(
     const updatedItem = await knex(Table.ITEMS)
       .where({ id: itemId })
       .update(object.toSnakeCase({ title, description }))
-      .returning(['title', 'description']);
+      .returning(['id', 'title', 'description']);
 
     logger.log('info', 'Item updated successfully');
     return object.camelize(updatedItem);

@@ -22,7 +22,7 @@ class UnauthorizedError extends Error {
    * @memberof UnauthorizedError
    */
   constructor(message: string) {
-    super(message, HttpStatus.UNAUTHORIZED);
+    super(message, HttpStatus.StatusCodes.UNAUTHORIZED);
 
     this.message = message;
   }

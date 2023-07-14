@@ -4,6 +4,7 @@ import * as itemControllers from '../controllers/items';
 import * as validate from '../middlewares/validate';
 import { loginSchema, userSchema } from '../validators/user';
 import { itemSchema } from '../validators/item';
+import authenticate from '../middlewares/authenticate';
 
 const router = Router();
 
@@ -19,7 +20,7 @@ router
   .patch(validate.schema(userSchema), userControllers.update);
 router
   .route('/:id/items')
-  .get(itemControllers.fetchItems)
-  .post(validate.schema(itemSchema), itemControllers.save);
+  .get(authenticate, itemControllers.fetchItems)
+  .post(validate.schema(itemSchema), authenticate, itemControllers.save);
 
 export default router;

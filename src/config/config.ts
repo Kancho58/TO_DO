@@ -1,11 +1,13 @@
 import * as dotenv from 'dotenv';
 import * as errors from '../resources/lang/error.json';
+import * as messages from '../resources/lang/messages.json';
 
 dotenv.config();
 const isLocalEnvironment = process.env.APP_PORT != undefined;
 
 export default {
   errors,
+  messages,
   name: 'todo-api',
   version: '2.0.0',
   host: process.env.APP_HOST || '127.0.0.1',

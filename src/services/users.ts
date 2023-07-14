@@ -29,7 +29,7 @@ export async function save(userPayload: UserPayload): Promise<UserPayload> {
 
     logger.log('info', 'User inserting');
     const newUser = await knex(Table.USERS)
-      .insert(object.toSnakeCase({ ...userPayload, password }))
+      .insert(object.toSnakeCase({ ...userPayload, password, roleId: 2 }))
       .returning(['name', 'email']);
     logger.log('info', 'User successfully inserted');
 
@@ -44,8 +44,10 @@ export async function login(loginPayload: LoginPayload): Promise<LoginPayload> {
     const { email, password } = loginPayload;
 
     logger.log('info', 'Fetching user');
-    const [user] = await knex(Table.USERS).where(
-      knex.raw('LOWER(email) =?', email.toLowerCase())
+    const [user] = object.camelize(
+      await knex(Table.USERS).where(
+        knex.raw('LOWER(email) =?', email.toLowerCase())
+      )
     );
     if (!user) {
       throw new BadRequestError('User not found');
@@ -61,6 +63,7 @@ export async function login(loginPayload: LoginPayload): Promise<LoginPayload> {
     const accessToken = jwt.generateAccessToken({
       email: user.email,
       name: user.name,
+      roleId: user.roleId,
     });
 
     return object.camelize({ id: user.id, email, accessToken });
@@ -90,7 +93,6 @@ export async function fetchUsers(
     id: user.id,
     name: user.name,
     email: user.email,
-    password: user.password,
   }));
 
   return object.camelize({ data, page, perPage, total });
@@ -114,7 +116,7 @@ export async function update(
     const updatedUser = await knex(Table.USERS)
       .where('id', userId)
       .update(object.toSnakeCase({ name, email, password }))
-      .returning(['name', 'email']);
+      .returning(['id', 'name', 'email']);
 
     logger.log('info', 'User updated successfully');
 

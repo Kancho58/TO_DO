@@ -9,23 +9,6 @@
     "refreshTokenExpired": "Session has been expired.",
     "portRequirePrivilege": "Port requires elevated privileges.",
     "unAuthorized": "You are not authorized to perform this action.",
-    "noPatientId": "Patient ID must be present.",
-    "noPatientFound": "Patient with provided ID not found.",
-    "patientVerificationTokenBadError": "Verification code is not correct.",
-    "profile": {
-      "badRequest": "User's Profile not found.",
-      "duplicate": "User already exists.",
-      "confirmSignupBadError": "Email and code doesn't match.",
-      "deleteBadError": "Code doesn't match."
-    },
-    "settings": {
-      "badRequest": "User's settings not found."
-    },
-    "patients": {
-      "duplicate": "Patient with the same phone number already exists. Please provide a unique phone number.",
-      "savedButTwilioFailed": "Patient created successfully but verification token could not be sent to the phone number provided. Please check your phone number and re-verify.",
-      "sendVerificationFailed": "Verification token could not be sent to the phone number provided. Please check your phone number and re-verify."
-    },
     "users": {
       "duplicate": "User with the same phone number already exists. Please provide a unique phone number."
     }

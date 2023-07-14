@@ -3,6 +3,9 @@ import { UserPayload } from '../domains/requests/userpayload';
 import * as HttpStatus from 'http-status-codes';
 import * as userServices from '../services/users';
 import LoginPayload from '../domains/requests/loginpayload';
+import config from '../config/config';
+
+const { messages } = config;
 
 export async function save(
   req: Request,
@@ -16,6 +19,7 @@ export async function save(
     res.status(HttpStatus.StatusCodes.CREATED).json({
       success: true,
       data: users,
+      messages: messages.auth.signupSuccess,
     });
   } catch (err) {
     next(err);
@@ -34,6 +38,7 @@ export async function login(
     res.status(HttpStatus.StatusCodes.OK).json({
       success: true,
       data,
+      message: messages.auth.loginSuccess,
     });
   } catch (err) {
     next(err);
