@@ -22,7 +22,49 @@ const tokenErrorMessageMap: any = {
  * @param {Response} res
  * @param {NextFunction} next
  */
-const authenticate = async (
+
+async function authenticate(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    res.locals.accessToken = String(req.headers.authorization).replace(
+      'Bearer ',
+      ''
+    );
+
+    if (!req.headers.authorization || !res.locals.accessToken) {
+      throw new BadRequestError(errors.noToken);
+    }
+
+    logger.log('info', 'JWT: Verifying token - %s', res.locals.accessToken);
+    const response: any = jwt.verifyAccessToken(res.locals.accessToken);
+
+    res.locals.loggedInPayload = response.data;
+
+    logger.log(
+      'debug',
+      'JWT: Authentication verified -',
+      res.locals.loggedInPayload
+    );
+
+    next();
+  } catch (err: any) {
+    const tokenErrorMessage = tokenErrorMessageMap[err.name];
+    logger.log('error', 'JWT: Authentication failed - %s', err.message);
+
+    if (tokenErrorMessage) {
+      logger.log('error', 'JWT: Token error - %s', tokenErrorMessage);
+
+      next(new UnauthorizedError(tokenErrorMessage));
+    } else {
+      next(err);
+    }
+  }
+}
+
+export const authorizeByAdmin = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -40,7 +82,7 @@ const authenticate = async (
     logger.log('info', 'JWT: Verifying token - %s', res.locals.accessToken);
     const response: any = jwt.verifyAccessToken(res.locals.accessToken);
 
-    if (response.data.roleId === 2) {
+    if (response.data.roleId === 1) {
       logger.log(
         'debug',
         'JWT: Authentication verified -',

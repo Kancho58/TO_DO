@@ -43,6 +43,26 @@ export async function fetchItems(
   }
 }
 
+export async function fetchItemsByAdmin(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> {
+  try {
+    const page = Number(req.query.page) || 1;
+    const perPage = Number(req.query.perPage || 5);
+    const total = perPage * (page - 1);
+
+    const data = await itemServices.fetchItemsByAdmin(page, perPage, total);
+    res.status(HttpStatus.StatusCodes.OK).json({
+      success: true,
+      ...data,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function update(
   req: Request,
   res: Response,

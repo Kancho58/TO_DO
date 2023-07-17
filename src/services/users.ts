@@ -98,6 +98,25 @@ export async function fetchUsers(
   return object.camelize({ data, page, perPage, total });
 }
 
+export async function fetchUsersById(userId: number): Promise<FetchUsers> {
+  const users = await knex(Table.USERS).where('id', userId);
+
+  if (!users) {
+    logger.log('info', 'User not found');
+    throw new BadRequestError('User not found');
+  }
+
+  logger.log('info', 'user fetched successfully');
+
+  const data = users.map((user) => ({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+  }));
+
+  return object.camelize({ data });
+}
+
 export async function update(
   userId: number,
   userPayload: UserPayload

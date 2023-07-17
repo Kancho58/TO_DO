@@ -65,6 +65,24 @@ export async function fetchUsers(
   }
 }
 
+export async function fetchUsersById(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const id: number = parseInt(req.params.id);
+
+    const data = await userServices.fetchUsersById(id);
+    res.status(HttpStatus.StatusCodes.OK).json({
+      success: true,
+      data,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function update(
   req: Request,
   res: Response,

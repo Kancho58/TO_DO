@@ -64,6 +64,34 @@ export async function fetchItems(
   return object.camelize({ data, page, perPage, total });
 }
 
+export async function fetchItemsByAdmin(
+  page: number,
+  perPage: number,
+  total: number
+): Promise<FetchItems> {
+  logger.log('info', 'Fetching items');
+
+  const items = await knex(Table.ITEMS)
+    .select('*')
+    .limit(perPage)
+    .offset(total);
+
+  if (!items) {
+    logger.log('info', 'Item not found');
+    throw new BadRequestError('Item not found');
+  }
+
+  logger.log('info', 'Item fetched successfully');
+
+  const data = items.map((item) => ({
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    userId: item.user_id,
+  }));
+  return object.camelize({ data, page, perPage, total });
+}
+
 export async function update(
   itemId: number,
   itemPayload: ItemPayload

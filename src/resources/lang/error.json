@@ -5,12 +5,9 @@
     "password":"Password dosent match",
     "accessTokenExpired": "Access token expired.",
     "noToken": "No token in authorization header.",
-    "sessionNotMaintained": "Session not maintained.",
-    "refreshTokenExpired": "Session has been expired.",
+    "refreshTokenExpired": "Token has been expired.",
     "portRequirePrivilege": "Port requires elevated privileges.",
     "unAuthorized": "You are not authorized to perform this action.",
-    "users": {
-      "duplicate": "User with the same phone number already exists. Please provide a unique phone number."
-    }
+    "noRoleId": "Role Id must be present"
   }
   

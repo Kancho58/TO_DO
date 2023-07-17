@@ -4,18 +4,12 @@
       "logoutSuccess": "Logout successful.",
       "invalidCredentials": "Invalid Credentials",
       "accessTokenRefreshed": "Access token refreshed successfully.",
-      "signupSuccess": "Signup successful.",
-      "confirmSignup": "Activated successfully.",
-      "forgotPassword": "Please check you email for verification code.",
-      "forgotPasswordForOldUser": "Password reset link has been sent to your email",
-      "resetPassword": "Password reset successfully."
+      "signupSuccess": "Signup successful."
     },
     "users": {
       "insert": "User inserted successfully.",
       "fetch": "User detail fetched successfully.",
-      "delete": "User removed successfully.",
-      "fetchAll": "List of users.",
-      "disclaimerAgreed": "Disclaimer agreed."
-    }
+      "update": "User update successfully.",
+      "fetchAll": "List of users."    }
   }
   

@@ -4,14 +4,16 @@ import * as itemControllers from '../controllers/items';
 import * as validate from '../middlewares/validate';
 import { loginSchema, userSchema } from '../validators/user';
 import { itemSchema } from '../validators/item';
-import authenticate from '../middlewares/authenticate';
+import authenticate, { authorizeByAdmin } from '../middlewares/authenticate';
 
 const router = Router();
 
 router
   .route('/')
-  .get(userControllers.fetchUsers)
+  .get(authorizeByAdmin, userControllers.fetchUsers)
   .post(validate.schema(userSchema), userControllers.save);
+
+router.route('/:id/user').get(authorizeByAdmin, userControllers.fetchUsersById);
 router
   .route('/login')
   .post(validate.schema(loginSchema), userControllers.login);
