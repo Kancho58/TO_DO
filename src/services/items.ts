@@ -28,7 +28,8 @@ export async function save(
       .returning(['title', 'description']);
 
     logger.log('info', 'Item successfully inserted');
-    return object.camelize(newItem);
+
+    return object.camelize(newItem[0]);
   } catch (err) {
     throw err;
   }
@@ -38,18 +39,16 @@ export async function fetchItems(
   userId: number,
   page: number,
   perPage: number,
-  total: number
+  offset: number
 ): Promise<FetchItems> {
   logger.log('info', 'Fetching items');
 
   const items = await knex(Table.ITEMS)
-    .select('*')
     .where(object.toSnakeCase({ userId }))
     .orderBy('id')
     .limit(perPage)
-    .offset(total);
-
-  if (!items) {
+    .offset(offset);
+  if (!items.length) {
     logger.log('info', 'Item not found');
     throw new BadRequestError('Item not found');
   }
@@ -61,22 +60,24 @@ export async function fetchItems(
     title: item.title,
     description: item.description,
   }));
-  return object.camelize({ data, page, perPage, total });
+  return object.camelize({ data, page, perPage });
 }
 
 export async function fetchItemsByAdmin(
+  userId: number,
   page: number,
   perPage: number,
-  total: number
+  offset: number
 ): Promise<FetchItems> {
   logger.log('info', 'Fetching items');
 
   const items = await knex(Table.ITEMS)
+    .where(object.toSnakeCase({ userId }))
     .select('*')
     .limit(perPage)
-    .offset(total);
+    .offset(offset);
 
-  if (!items) {
+  if (!items.length) {
     logger.log('info', 'Item not found');
     throw new BadRequestError('Item not found');
   }
@@ -89,7 +90,7 @@ export async function fetchItemsByAdmin(
     description: item.description,
     userId: item.user_id,
   }));
-  return object.camelize({ data, page, perPage, total });
+  return object.camelize({ data, page, perPage });
 }
 
 export async function update(
@@ -101,9 +102,9 @@ export async function update(
 
     logger.log('info', 'Fetching items');
 
-    const item = await knex(Table.ITEMS).where({ id: itemId });
+    const items = await knex(Table.ITEMS).where({ id: itemId });
 
-    if (!item) {
+    if (!items.length) {
       logger.log('info', 'Item not found');
       throw new BadRequestError('Item not found');
     }
@@ -113,7 +114,8 @@ export async function update(
       .returning(['id', 'title', 'description']);
 
     logger.log('info', 'Item updated successfully');
-    return object.camelize(updatedItem);
+
+    return object.camelize(updatedItem[0]);
   } catch (err) {
     throw err;
   }

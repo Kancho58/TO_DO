@@ -9,6 +9,6 @@ export interface ItemPayload {
 export interface FetchItems {
   page: number;
   perPage: number;
-  total: number;
+  offset: number;
   data: ItemPayload;
 }

@@ -12,5 +12,4 @@ export interface FetchUsers {
   data: UserPayload;
   page: number;
   perPage: number;
-  total: number;
 }

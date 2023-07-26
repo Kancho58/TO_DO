@@ -10,8 +10,11 @@ export async function save(
 ): Promise<void> {
   try {
     const itemPayload = req.body as ItemPayload;
-    const userId: number = parseInt(req.params.id);
-    const item = await itemServices.save(itemPayload, userId);
+
+    const item = await itemServices.save(
+      itemPayload,
+      res.locals.loggedInPayload.userId
+    );
 
     res.status(HttpStatus.StatusCodes.CREATED).json({
       success: true,
@@ -30,13 +33,17 @@ export async function fetchItems(
   try {
     const page = Number(req.query.page) || 1;
     const perPage = Number(req.query.perPage || 5);
-    const total = perPage * (page - 1);
+    const offset = perPage * (page - 1);
 
-    const userId: number = parseInt(req.params.id);
-    const data = await itemServices.fetchItems(userId, page, perPage, total);
+    const data = await itemServices.fetchItems(
+      res.locals.loggedInPayload.userId,
+      page,
+      perPage,
+      offset
+    );
     res.status(HttpStatus.StatusCodes.OK).json({
       success: true,
-      ...data,
+      data,
     });
   } catch (err) {
     next(err);
@@ -51,12 +58,18 @@ export async function fetchItemsByAdmin(
   try {
     const page = Number(req.query.page) || 1;
     const perPage = Number(req.query.perPage || 5);
-    const total = perPage * (page - 1);
+    const offset = perPage * (page - 1);
+    const userId = parseInt(req.params.id);
 
-    const data = await itemServices.fetchItemsByAdmin(page, perPage, total);
+    const data = await itemServices.fetchItemsByAdmin(
+      userId,
+      page,
+      perPage,
+      offset
+    );
     res.status(HttpStatus.StatusCodes.OK).json({
       success: true,
-      ...data,
+      data,
     });
   } catch (err) {
     next(err);

@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { UserPayload } from '../domains/requests/userpayload';
 import * as HttpStatus from 'http-status-codes';
 import * as userServices from '../services/users';
-import LoginPayload from '../domains/requests/loginpayload';
 import config from '../config/config';
 
 const { messages } = config;
@@ -19,53 +18,14 @@ export async function save(
     res.status(HttpStatus.StatusCodes.CREATED).json({
       success: true,
       data: users,
-      messages: messages.auth.signupSuccess,
+      messages: messages.users.insert,
     });
   } catch (err) {
     next(err);
   }
 }
 
-export async function login(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<any> {
-  try {
-    const user = req.body as LoginPayload;
-
-    const data = await userServices.login(user);
-    res.status(HttpStatus.StatusCodes.OK).json({
-      success: true,
-      data,
-      message: messages.auth.loginSuccess,
-    });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function fetchUsers(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<any> {
-  try {
-    const page = Number(req.query.page) || 1;
-    const perPage = Number(req.query.perPage || 5);
-    const total = perPage * (page - 1);
-
-    const data = await userServices.fetchUsers(page, perPage, total);
-    res.status(HttpStatus.StatusCodes.OK).json({
-      success: true,
-      ...data,
-    });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function fetchUsersById(
+export async function fetchUserById(
   req: Request,
   res: Response,
   next: NextFunction
@@ -74,9 +34,30 @@ export async function fetchUsersById(
     const id: number = parseInt(req.params.id);
 
     const data = await userServices.fetchUsersById(id);
+
     res.status(HttpStatus.StatusCodes.OK).json({
       success: true,
       data,
+      messages: messages.users.fetchAll,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function fetchUserDetails(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const data = await userServices.fetchUsersById(
+      res.locals.loggedInPayload.userId
+    );
+    res.status(HttpStatus.StatusCodes.OK).json({
+      success: true,
+      data,
+      messages: messages.users.fetch,
     });
   } catch (err) {
     next(err);
@@ -90,12 +71,15 @@ export async function update(
 ): Promise<void> {
   try {
     const userPayload = req.body as UserPayload;
-    const id: number = parseInt(req.params.id);
 
-    const updatedUser = await userServices.update(id, userPayload);
+    const data = await userServices.update(
+      res.locals.loggedInPayload.userId,
+      userPayload
+    );
     res.status(HttpStatus.StatusCodes.OK).json({
       success: true,
-      data: updatedUser,
+      data,
+      messages: messages.users.update,
     });
   } catch (err) {
     next(err);
