@@ -26,13 +26,13 @@ export async function save(userPayload: UserPayload): Promise<any> {
       throw new BadRequestError('User already exists');
     }
 
-    logger.log('Info', 'User inserting');
+    logger.log('info', 'User inserting');
     const newUser = await knex(Table.USERS)
       .insert(object.toSnakeCase({ name, email }))
       .returning(['name', 'email']);
-    logger.log('Info', 'User successfully inserted');
+    logger.log('info', 'User successfully inserted');
 
-    return newUser;
+    return object.camelize(newUser[0]);
   } catch (err) {
     throw err;
   }
@@ -111,29 +111,31 @@ export async function fetchUsers(
     .orderBy('id')
     .limit(perPage)
     .offset(offset);
-  if (!users) {
+  if (!users.length) {
     logger.log('info', 'User not found');
     throw new BadRequestError('User not found');
   }
 
   logger.log('info', 'user fetched successfully');
 
-  const user = users[0];
-  return object.camelize({
+  const data = users.map((user) => ({
     id: user.id,
     name: user.name,
     email: user.email,
+  }));
+  return object.camelize({
+    data,
     page,
     perPage,
   });
 }
 
-export async function fetchUsersById(userId: number): Promise<FetchUsers> {
+export async function fetchUserById(userId: number): Promise<FetchUsers> {
   const users = await knex(Table.USERS).where('id', userId);
 
   if (!users.length) {
-    logger.log('info', 'User is not logged in');
-    throw new BadRequestError('User is not logged in');
+    logger.log('info', 'User not found');
+    throw new BadRequestError('User not found');
   }
 
   logger.log('info', 'user fetched successfully');

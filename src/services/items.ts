@@ -45,6 +45,7 @@ export async function fetchItems(
 
   const items = await knex(Table.ITEMS)
     .where(object.toSnakeCase({ userId }))
+    .select('*')
     .orderBy('id')
     .limit(perPage)
     .offset(offset);
@@ -59,36 +60,6 @@ export async function fetchItems(
     id: item.id,
     title: item.title,
     description: item.description,
-  }));
-  return object.camelize({ data, page, perPage });
-}
-
-export async function fetchItemsByAdmin(
-  userId: number,
-  page: number,
-  perPage: number,
-  offset: number
-): Promise<FetchItems> {
-  logger.log('info', 'Fetching items');
-
-  const items = await knex(Table.ITEMS)
-    .where(object.toSnakeCase({ userId }))
-    .select('*')
-    .limit(perPage)
-    .offset(offset);
-
-  if (!items.length) {
-    logger.log('info', 'Item not found');
-    throw new BadRequestError('Item not found');
-  }
-
-  logger.log('info', 'Item fetched successfully');
-
-  const data = items.map((item) => ({
-    id: item.id,
-    title: item.title,
-    description: item.description,
-    userId: item.user_id,
   }));
   return object.camelize({ data, page, perPage });
 }

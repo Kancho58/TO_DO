@@ -61,12 +61,7 @@ export async function fetchItemsByAdmin(
     const offset = perPage * (page - 1);
     const userId = parseInt(req.params.id);
 
-    const data = await itemServices.fetchItemsByAdmin(
-      userId,
-      page,
-      perPage,
-      offset
-    );
+    const data = await itemServices.fetchItems(userId, page, perPage, offset);
     res.status(HttpStatus.StatusCodes.OK).json({
       success: true,
       data,

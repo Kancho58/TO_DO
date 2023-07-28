@@ -16,9 +16,7 @@ router
 
 router.use(authenticate);
 
-// router.route('/logout').post(authControllers.logout);
-
-router.route('/').get(authenticate, userControllers.fetchUserDetails);
+router.route('/my').get(authenticate, userControllers.fetchUserDetails);
 
 router
   .route('/update')

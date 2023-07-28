@@ -8,9 +8,11 @@ const router = Router();
 
 router.use(authorizeByAdmin);
 
-router.route('/').post(userControllers.save);
+router.route('/user').post(userControllers.save);
 
 router.route('/users/:id/items').get(itemControllers.fetchItemsByAdmin);
+
+router.route('/users/').get(userControllers.fetchUsers);
 
 router.route('/user/:id').get(userControllers.fetchUserById);
 

@@ -33,7 +33,7 @@ export async function fetchUserById(
   try {
     const id: number = parseInt(req.params.id);
 
-    const data = await userServices.fetchUsersById(id);
+    const data = await userServices.fetchUserById(id);
 
     res.status(HttpStatus.StatusCodes.OK).json({
       success: true,
@@ -51,13 +51,34 @@ export async function fetchUserDetails(
   next: NextFunction
 ): Promise<void> {
   try {
-    const data = await userServices.fetchUsersById(
+    const data = await userServices.fetchUserById(
       res.locals.loggedInPayload.userId
     );
     res.status(HttpStatus.StatusCodes.OK).json({
       success: true,
       data,
       messages: messages.users.fetch,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function fetchUsers(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const page = Number(req.query.page) || 1;
+    const perPage = Number(req.query.perPage || 5);
+    const offset = perPage * (page - 1);
+
+    const data = await userServices.fetchUsers(page, perPage, offset);
+    res.status(HttpStatus.StatusCodes.OK).json({
+      success: true,
+      data,
+      messages: messages.users.fetchAll,
     });
   } catch (err) {
     next(err);
