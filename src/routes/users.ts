@@ -18,8 +18,6 @@ router.use(authenticate);
 
 router.route('/my').get(authenticate, userControllers.fetchUserDetails);
 
-router
-  .route('/update')
-  .patch(validate.schema(userSchema), userControllers.update);
+router.route('/update').patch(userControllers.update);
 
 export default router;

@@ -1,21 +1,26 @@
 /* eslint-disable no-useless-catch */
-import { UserPayload, FetchUsers } from '../domains/requests/userpayload';
+import {
+  UserPayload,
+  FetchUsers,
+  UpdatePayload,
+} from '../domains/requests/userpayload';
 import knex from '../config/knex';
 import logger from '../untils/logger';
-import config from '../config/config';
 import BadRequestError from '../exceptions/BadRequestError';
 import Table from '../resources/enums/Table';
 import * as object from '../untils/object';
 import * as bcrypt from '../untils/bcrypt';
 import LoginPayload from '../domains/requests/loginpayload';
 import * as jwt from '../untils/jwt';
-import UnauthorizedError from '../exceptions/BadRequestError';
-
-const { errors } = config;
+import { createOtp, isTokenExpired } from '../untils/tokens';
 
 export async function save(userPayload: UserPayload): Promise<any> {
   try {
     const { name, email } = userPayload;
+    const codeCreatedAt = new Date();
+
+    logger.log('info', 'Code Created For User');
+    const code: string = createOtp();
 
     const user = await knex(Table.USERS).where(
       knex.raw('LOWER(email) =?', email.toLowerCase())
@@ -27,12 +32,12 @@ export async function save(userPayload: UserPayload): Promise<any> {
     }
 
     logger.log('info', 'User inserting');
-    const newUser = await knex(Table.USERS)
-      .insert(object.toSnakeCase({ name, email }))
+    await knex(Table.USERS)
+      .insert(object.toSnakeCase({ name, email, code, codeCreatedAt }))
       .returning(['name', 'email']);
     logger.log('info', 'User successfully inserted');
 
-    return object.camelize(newUser[0]);
+    return code;
   } catch (err) {
     throw err;
   }
@@ -77,13 +82,24 @@ export async function login(loginPayload: LoginPayload): Promise<LoginPayload> {
     if (!user) {
       throw new BadRequestError('User not found');
     }
-    await knex(Table.USERS).where(
-      knex.raw('LOWER(email) =?', email.toLowerCase())
+    logger.log('info', 'Comparing users password');
+
+    const isPasswordValidate = await bcrypt.compare(
+      password,
+      user.password || ''
     );
 
-    const isValidate = await bcrypt.compare(password, user.password || '');
-    if (!isValidate) {
-      throw new UnauthorizedError(errors.password);
+    logger.log('info', 'Comparing users code');
+
+    const isCodeValidate = await knex(Table.USERS).where('code', password);
+    if (isTokenExpired(object.toSnakeCase(user).codeCreatedAt)) {
+      logger.log('info', 'code expired');
+      throw new BadRequestError('Code expired');
+    }
+
+    if (!isPasswordValidate && isCodeValidate.length === 0) {
+      logger.log('info', "Users' password or code dose not match");
+      throw new BadRequestError("Users' password or code dose not match");
     }
 
     logger.log('info', 'Generating access token');
@@ -147,11 +163,11 @@ export async function fetchUserById(userId: number): Promise<FetchUsers> {
 
 export async function update(
   userId: number,
-  userPayload: UserPayload
-): Promise<UserPayload> {
+  updatePayload: UpdatePayload
+): Promise<UpdatePayload> {
   try {
-    const { name, email } = userPayload;
-    const password = await bcrypt.hash(userPayload.password);
+    const { name } = updatePayload;
+    const password = await bcrypt.hash(updatePayload.password);
 
     logger.log('info', 'Fetching User');
     const users = await knex(Table.USERS).where('id', userId);
@@ -162,7 +178,7 @@ export async function update(
     }
     const updatedUser = await knex(Table.USERS)
       .where('id', userId)
-      .update(object.toSnakeCase({ name, email, password }))
+      .update(object.toSnakeCase({ name, password, isPasswordSet: true }))
       .returning(['id', 'name', 'email']);
 
     logger.log('info', 'User updated successfully');

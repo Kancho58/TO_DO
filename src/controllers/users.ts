@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserPayload } from '../domains/requests/userpayload';
+import { UpdatePayload, UserPayload } from '../domains/requests/userpayload';
 import * as HttpStatus from 'http-status-codes';
 import * as userServices from '../services/users';
 import config from '../config/config';
@@ -91,11 +91,11 @@ export async function update(
   next: NextFunction
 ): Promise<void> {
   try {
-    const userPayload = req.body as UserPayload;
+    const updatePayload = req.body as UpdatePayload;
 
     const data = await userServices.update(
       res.locals.loggedInPayload.userId,
-      userPayload
+      updatePayload
     );
     res.status(HttpStatus.StatusCodes.OK).json({
       success: true,

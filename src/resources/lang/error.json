@@ -2,7 +2,6 @@
     "portInUse": "Port is already in use.",
     "invalidToken": "Your token is invalid.",
     "invalidCredentials": "Invalid Credentials",
-    "password":"Password dosent match",
     "accessTokenExpired": "Access token expired.",
     "noToken": "No token in authorization header.",
     "refreshTokenExpired": "Token has been expired.",

@@ -13,3 +13,8 @@ export interface FetchUsers {
   page: number;
   perPage: number;
 }
+
+export interface UpdatePayload {
+  name: string;
+  password: string;
+}
