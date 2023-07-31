@@ -22,9 +22,7 @@ export function schema(params: Joi.Schema) {
         body: body,
       });
 
-      console.log(req.body, params);
       await validate(req.body, params);
-      console.log('validated');
 
       logger.log('info', 'Schema successfully validated');
 

@@ -13,4 +13,19 @@ export const userSchema = Joi.object()
         /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
       )
       .message('Please enter a valid email address'),
+    password: Joi.string().trim().min(6).label('Password').required(),
+  });
+
+export const loginSchema = Joi.object()
+  .options({ abortEarly: false })
+  .keys({
+    email: Joi.string()
+      .label('Email')
+      .trim()
+      .required()
+      .regex(
+        /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+      )
+      .message('Please enter a valid email address'),
+    password: Joi.string().trim().min(6).label('Password').required(),
   });

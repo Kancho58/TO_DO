@@ -1,20 +1,23 @@
 import { Router } from 'express';
 import * as userControllers from '../controllers/users';
-import * as itemControllers from '../controllers/items';
+import * as authControllers from '../controllers/auth';
 import * as validate from '../middlewares/validate';
-import { userSchema } from '../validators/user';
-import { itemSchema } from '../validators/item';
+import { loginSchema, userSchema } from '../validators/user';
+import authenticate from '../middlewares/authenticate';
 
 const router = Router();
 
-router.route('/:page/fetch').get(userControllers.fetchUsers);
-router.route('/').post(validate.schema(userSchema), userControllers.save);
 router
-  .route('/:id/update')
-  .patch(validate.schema(userSchema), userControllers.update);
-router.route('/:id/:page/items').get(itemControllers.fetchItems);
+  .route('/register')
+  .post(validate.schema(userSchema), authControllers.register);
 router
-  .route('/:id/items')
-  .post(validate.schema(itemSchema), itemControllers.save);
+  .route('/login')
+  .post(validate.schema(loginSchema), authControllers.login);
+
+router.use(authenticate);
+
+router.route('/my').get(authenticate, userControllers.fetchUserDetails);
+
+router.route('/update').patch(userControllers.update);
 
 export default router;
