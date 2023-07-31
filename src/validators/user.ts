@@ -29,3 +29,10 @@ export const loginSchema = Joi.object()
       .message('Please enter a valid email address'),
     password: Joi.string().trim().min(6).label('Password').required(),
   });
+
+export const updateSchema = Joi.object()
+  .options({ abortEarly: false })
+  .keys({
+    name: Joi.string().trim().min(1).label('Name').required(),
+    password: Joi.string().trim().min(6).label('Password').required(),
+  });
