@@ -92,14 +92,16 @@ export async function login(loginPayload: LoginPayload): Promise<LoginPayload> {
     logger.log('info', 'Comparing users code');
 
     const isCodeValidate = await knex(Table.USERS).where('code', password);
-    if (isTokenExpired(object.toSnakeCase(user).codeCreatedAt)) {
-      logger.log('info', 'code expired');
-      throw new BadRequestError('Code expired');
+    if (isCodeValidate) {
+      if (isTokenExpired(object.toSnakeCase(user).codeCreatedAt)) {
+        logger.log('info', 'code expired');
+        throw new BadRequestError('Code expired');
+      }
     }
 
     if (!isPasswordValidate && isCodeValidate.length === 0) {
-      logger.log('info', "Users' password or code dose not match");
-      throw new BadRequestError("Users' password or code dose not match");
+      logger.log('info', 'Credential does not match');
+      throw new BadRequestError('Credential does not match');
     }
 
     logger.log('info', 'Generating access token');
@@ -111,7 +113,12 @@ export async function login(loginPayload: LoginPayload): Promise<LoginPayload> {
       userId: user.id,
     });
 
-    return object.camelize({ id: user.id, email, accessToken });
+    return object.camelize({
+      id: user.id,
+      email,
+      accessToken,
+      isPasswordSet: user.isPasswordSet,
+    });
   } catch (error) {
     throw error;
   }
